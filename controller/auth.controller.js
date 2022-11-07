@@ -1,4 +1,6 @@
 const User = require("../model/user");
+const { SECRET } = process.env;
+const jwt = require("jsonwebtoken");
 
 const signUp = async (req, res) => {
   const { fname, lname, email, password } = req.body;
@@ -18,7 +20,7 @@ const signIn = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && user.password === password) {
-    res.send("Dummy Token");
+    res.send(jwt.sign({ email }, SECRET));
   } else {
     res.send("user doesn't exist");
   }
