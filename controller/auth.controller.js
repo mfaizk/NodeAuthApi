@@ -31,10 +31,17 @@ const signIn = async (req, res) => {
 
   const user = await User.findOne({ email });
   // console.log(await bcrypt.compare(password, user.password));
+  const token = jwt.sign({ email: user.email, id: user._id }, SECRET, {
+    expiresIn: "2days",
+  });
 
   if (user) {
     if (await bcrypt.compare(password, user.password)) {
-      res.send(jwt.sign({ email }, SECRET));
+      user.password = undefined;
+      res.status(200).cookie("token", token, { httpOnly: true }).send({
+        user,
+      });
+      // res.send(jwt.sign({ email }, SECRET));
     } else {
       res.send("password isn't correct");
     }
@@ -43,4 +50,8 @@ const signIn = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn };
+const dashBoard = (req, res) => {
+  res.send("Welcome to dashboard");
+};
+
+module.exports = { signUp, signIn, dashBoard };
